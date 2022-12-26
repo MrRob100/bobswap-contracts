@@ -25,7 +25,7 @@ contract BobswapRecords {
         string price_token_0;
         string price_token_1;
         string note;
-        string date;
+        uint256 date;
     }
 
     struct Pair {
@@ -41,7 +41,7 @@ contract BobswapRecords {
 
     mapping(address => mapping(uint => Pair)) usersPairsArrayNested;
 
-    mapping(address => mapping(uint => Record)) usersPairRecordsArrayNested;
+    mapping(address => mapping(uint => Record[])) addressToPairIdToPairRecordsArray;
 
     function addPairNested(
         string memory token0Symbol,
@@ -89,5 +89,46 @@ contract BobswapRecords {
 
     function getUsersPairs() public view returns (Pair[] memory) {
         return usersPairsArray[msg.sender];
+    }
+
+//    function addRecord(
+//        uint256 pairId,
+//        uint256 balance_token0,
+//        uint256 balance_token1,
+//        uint256 balance_token0_usd,
+//        uint256 balance_token1_usd,
+//        string price_token_0,
+//        string price_token_1,
+//        string note,
+//        string date //'now' keyword)
+//    ) external {
+        //all params should be generated from the router contract apart from note which will be 'automated'
+//    }
+
+    function addRecordManually(
+        uint256 pairId,
+        uint256 balance_token0,
+        uint256 balance_token1,
+        uint256 balance_token0_usd,
+        uint256 balance_token1_usd,
+        string memory price_token_0,
+        string memory price_token_1
+    ) external {
+        _pairCounter.increment();
+
+        addressToPairIdToPairRecordsArray[msg.sender][pairId].push(Record(
+            balance_token0,
+            balance_token1,
+            balance_token0_usd,
+            balance_token1_usd,
+            price_token_0,
+            price_token_1,
+            'manually added',
+            block.timestamp
+        ));
+    }
+
+    function getRecords(uint256 pairId) public view returns (Record[] memory) {
+        return addressToPairIdToPairRecordsArray[msg.sender][pairId];
     }
 }

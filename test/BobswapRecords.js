@@ -39,4 +39,17 @@ describe("BobswapRecords", function () {
         expect(pair['token0Symbol']).to.equal("REN");
         expect(pair['token1Symbol']).to.equal("LINK");
     });
+
+    it("Should be able to add and retrieve a user's pair's record", async function() {
+        await contract.addPairNested("REN", "LINK", 1, "Single", '{"0": "0xABC", "1": "0xXYZ"}');
+        let counter = await contract.getCounter();
+        await contract.addRecordManually(counter, 20, 0, 200, 0, '0.04', '20');
+        await contract.addRecordManually(counter, 0, 30, 0, 300, '0.05', '18');
+        let records = await contract.getRecords(counter);
+
+        expect(records[0]['balance_token0']).to.equal(20);
+        expect(records[0]['balance_token1']).to.equal(0);
+        expect(records[1]['balance_token0']).to.equal(0);
+        expect(records[1]['balance_token1']).to.equal(30);
+    })
 });
